@@ -1,0 +1,155 @@
+
+1. Convolutional Neural Networks (CNNs) Embeddings:
+   - What is a CNN?
+    deep learning model designed to process visual data. 
+    don't treat every pixel in an image equally, 
+    CNNs use filters (small sliding windows) that capture specific features such as edges, textures, and shapes. 
+    Model focuses on patterns in the image.
+   
+   - How CNN Embeddings Work:
+     CNNs process an image through multiple layers, 
+     with each layer learning increasingly abstract features. 
+     After passing through several layers, 
+     the image is compressed into a lower-dimensional vector called an "embedding." 
+
+   - Use Cases:
+    image classification, similarity searches, and clustering. 
+    Pretrained CNNs (like ResNet or VGG) can be fine-tuned to specific tasks or used directly for extracting image embeddings.
+
+---
+
+2. Self-Supervised Learning Models (e.g., SimCLR, MoCo, BYOL):
+   - What is Self-Supervised Learning?
+     Self-supervised learning models learn without the need for labels. 
+     These models create their own "tasks" to learn from the data itself.
+
+     I'm a little worries about the efficacy or speed of this however
+        Over training is another potential issue
+   
+   - How Self-Supervised Models Work:
+     Goal is to make two different augmented views of the same image similar in the embedding space, 
+     while making embeddings of different images distinct. 
+     For example, SimCLR takes an image, creates two random transformations (like cropping or flipping), 
+     and trains the model to recognize that these two versions come from the same source. 
+     The output is an embedding that captures the essence of the image.
+
+     This I like, It will allow us to skip some preprocessing steps
+        And we worry less about how transformations affect the embeddings
+
+   - Use Cases:
+     Self-supervised learning models are particularly useful when you have a large dataset without labels. 
+     They produce embeddings that can be used for similarity searches or clustering, 
+     even without manually categorizing each image.
+
+---
+
+3. Autoencoders:
+   - What is an Autoencoder?
+     An autoencoder is a type of neural network designed to compress data (like images) into a smaller representation 
+     and then reconstruct it back to its original form. It has two main parts:
+       1. Encoder: Compresses the image into a lower-dimensional vector (embedding).
+       2. Decoder: Tries to recreate the original image from this compressed embedding.
+
+    We would stop at step 1 here
+   
+   - How Autoencoders Work:
+     The encoder learns to capture the most important features of the image and discard unnecessary details. 
+     The resulting embedding represents a condensed version of the image. 
+     After training, you can use the encoder’s output (the embedding) to compare images or group similar ones together.
+
+   - Use Cases:
+     Autoencoders are excellent for unsupervised learning tasks where the goal is to group similar images (clustering) 
+     or find patterns without labels. 
+     They're widely used in dimensionality reduction, image denoising, and anomaly detection.
+
+---
+
+4. Vision Transformers (ViTs):
+   - What is a Transformer?
+     Originally developed for language tasks (like translation)
+     Processes data in parallel and can learn relationships between different parts of the input. 
+     Treats the image as a sequence of patches rather than using filters like CNNs.
+   
+   - How Vision Transformers Work:
+     ViTs divide the image into small patches and process these patches in parallel. 
+     This creates a final embedding that captures the image's global structure and important features. The main difference from CNNs is that ViTs are not restricted to local filters (small sliding windows) but can learn long-range relationships within the image.
+
+   - Use Cases:
+     Used in image classification and embeddings
+     they are highly competitive with CNNs. 
+     They are particularly useful for capturing both fine details and the overall structure of the image.
+
+---
+Background Information:
+
+1. Embeddings:
+   - An embedding is a representation of an image as a vector (a list of numbers) in a lower-dimensional space. 
+   Instead of representing an image by every pixel, embeddings capture the essential features of an image. 
+   The main goal is to make images that are similar to each other have similar embeddings.
+
+2. Similarity Search:
+   - Similarity search involves finding images that are "close" to each other in the embedding space. By comparing the embeddings of different images, we can measure how similar they are. The closer the vectors (embeddings), the more similar the images.
+
+3. Clustering:
+   - Clustering groups similar images together based on their embeddings. It is often used when we don't have predefined categories (unsupervised learning). For example, you can cluster your black hole images into groups of "rings," "double rings," and "no rings" without manual labeling.
+
+
+
+
+An autoencoder with 10 dims
+    Fit gaussian to each cluster 
+    Split the embedding space into many small spaces/models
+
+    Separate the latent space
+
+    Difference in some dimensions may affect L2 distances
+        Embedding helps clustering by getting rid of noise within data
+
+Preliminary embedding to get rid of high-dimensional noise
+
+Black hole
+    Spin 
+    Initial condition
+    Becomes an initial boundary problem
+
+    mass and flux
+        2 mass: density of the plasma and black hole mass
+
+Embedding in row form
+    Find out the dimensionless parameters that they correspond to
+
+
+image pixel by pixel is highly dimensional data
+
+We want to normalize the images beyond rotations and shifts
+
+
+Longless of elipse
+    Tilted/rotations
+
+2 well defined clusters and see if there is any clusters
+
+
+
+
+Autoencoder
+
+Scalling in terms of cost of training
+n parameters
+    n2 is expensive
+
+embedding alignment
+
+
+
+
+
+
+
+
+
+
+
+
+
+
