@@ -4,6 +4,10 @@ A Course in Machine Learning by Hal Daume III
 
 
 
+HuggingFace: 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
+
+
+
 
 Sept 22nd
 

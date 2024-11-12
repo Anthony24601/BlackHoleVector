@@ -1,0 +1,56 @@
+Install llama and move to directory
+It must go llama_models/llama3_1/...
+
+Dependencies
+
+fire
+torch
+fairscale
+tiktoken
+pydantic
+strong_typing
+    You need to change a line in strong typing because of module error
+        from collections.Mapping to collections.abc.Mapping. Old way is deprecated
+        Another issue, strong_typing.schema is not found in llama3_1/api/datatypes.py
+    below is fix
+json-strong-typing
+
+In nano-llama31/llama_models/models/llama3_1/api/datatypes.py
+why is it trying to reference itself?
+Just comment it out, it has a #noqa anyways
+
+
+change any reference to llama-models to llama_models because ...
+
+blobfile
+
+
+
+
+Some high dim data (lots of them)
+    Start random then organize?
+
+Consider a problem where
+    given a vector
+        dot input vector with all vector in high dim data
+        sum over all vectors
+        How do we speed up this sort of thing?
+    Through decomposition only run over small share of them that will meaningfully contribute to the dot product
+
+Comparison
+    How fast vs how inaccurate
+
+if dim = 10
+then octants 2^10
+
+
+How expensive is the dot product in the attention mechanism
+
+
+
+
+
+
+Investigate how vector db stores vectors for dot product
+    Break up sphere into sectors?
+

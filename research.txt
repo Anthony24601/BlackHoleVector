@@ -142,6 +142,52 @@ embedding alignment
 
 
 
+1. Flat Index (IndexFlatL2): In a flat index, Faiss stores vectors in a list-like structure without additional
+ preprocessing. During upserts, vectors are simply appended or replaced without extra computation. Searches in
+  this index type are brute-force, meaning no clustering or compression is done ahead of time, so every distance
+ calculation is handled at query time, making it straightforward but less optimized for very large datasets.
+
+2. IVF Index (Inverted File Index): With an IVF index, Faiss first clusters the space into cells using a k-means
+ clustering technique. When vectors are added or updated, Faiss assigns each vector to the nearest centroid, 
+ effectively placing it in a specific cell within the index. This structure reduces search time by only searching 
+ relevant cells, but adding or updating vectors still involves computing distances to centroids to find the 
+ appropriate cell. The main precomputation (centroid calculation) happens when the index is created rather 
+ than during each individual upsert.
+
+3. Product Quantization (PQ) Index: Product quantization compresses vectors by splitting them into smaller 
+sub-vectors and mapping each to a codebook entry (a cluster within each subspace). When upserting, Faiss 
+finds the nearest codebook entry for each subspace, enabling the vector to be represented as a compact code. 
+This approach reduces memory usage and query time but requires computing nearest sub-vectors during the upsert 
+to assign them to the codebook entries. The PQ encoding itself is precomputed during index creation.
+
+4. HNSW (Hierarchical Navigable Small World): In this graph-based index, Faiss updates the proximity graph 
+when new vectors are added. The new vector connects to its closest neighbors, requiring Faiss to compute distances
+to establish these relationships dynamically. No additional clustering or codebook assignment occurs here, but 
+upserts do involve localized graph updates.
+
+
+
+
+In a standard transformer, particularly the self-attention mechanism, dot product operations are responsible 
+for a significant portion of the computational cost, often around 70% of the total time and energy used, 
+depending on the model size, input length, and hardware.
+
+
+Self-Attention Mechanism: Each token in an input sequence is compared to every other token in that sequence 
+to compute attention scores. This requires a large number of dot products, scaling quadratically with 
+sequence length O(n^2d) where n is the sequence length and d is the embedding dimension.
+
+Scaling with Layers: Each layer of the transformer repeats this operation across multiple attention heads. 
+For example, a model like BERT-base with 12 layers and 12 heads per layer performs a vast number of dot products 
+at each layer, further compounding the computational cost.
+
+Hardware and Memory Bandwidth: The dot product’s memory and compute requirements can outstrip the available 
+bandwidth on most hardware, especially for long sequences and large batch sizes. This is a primary bottleneck 
+in real-world deployment.
+
+Optimization Efforts: Techniques like sparse attention, low-rank approximations, and hardware accelerators 
+(like TPUs and GPUs optimized for matrix multiplications) have been introduced largely to mitigate the cost 
+of these dot products by reducing their frequency or approximating the computations.
 
 
 
@@ -149,7 +195,34 @@ embedding alignment
 
 
 
+In transformer architectures, the self-attention mechanism is indeed one of the largest computational contributors,
+typically making up about 70% of the overall processing cost. This high percentage is due to the quadratic scaling
+of self-attention with respect to sequence length, as it involves computing attention weights for every token pair
+, which becomes computationally intense for long sequences and large models.
 
+"On the Computational Complexity of Self-Attention" (2023): This paper discusses why self-attention’s complexity 
+is difficult to reduce below quadratic scaling and examines the use of approximations to mitigate some of these 
+costs in large models
+
+
+In the self-attention mechanism, the dot product calculation forms the core of the computational workload, 
+typically representing around 80-90% of the self-attention's operations. This is because self-attention relies 
+on computing attention scores for each token pair within a sequence, which is achieved by taking the dot product
+ of query and key vectors, followed by a softmax operation and matrix multiplication with value vectors.
+
+How it works:
+
+Dot Product of Queries and Keys: This is the most computationally intensive part, as it requires a matrix 
+multiplication that scales quadratically with sequence length (O(n2⋅d)), where nn is the sequence length 
+and dd is the embedding dimension. This step alone accounts for the majority of self-attention’s computational cost.
+
+Softmax and Weighted Sum with Value Vectors: After the dot products, the resulting attention scores are normalized 
+with softmax and multiplied with value vectors. While essential, this step is computationally lighter than the dot 
+product operations.
+
+Therefore, the self-attention mechanism essentially revolves around these dot product calculations. The time and 
+space complexity here underscores why self-attention is computationally expensive, prompting research into methods 
+like sparse attention to reduce the impact of these dot products for large sequences
 
 
 
