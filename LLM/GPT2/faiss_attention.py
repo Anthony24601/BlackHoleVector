@@ -20,17 +20,29 @@ class FAISSAttention(GPT2Attention):
         #if self.index.ntotal == 0:
         self.index.add(key_np.reshape(-1, self.head_dim))
 
-    def faiss_based_attention(self, query, value):
-        print("attention entered")
-        query_np = query.detach().cpu().numpy().astype(np.float32).reshape(-1, self.head_dim)
-        print("Query shape:",query_np.shape)
-        distances, indices = self.index.search(query_np, self.k_neighbors)
-        print("Search done")
-        indices = torch.tensor(indices, device=value.device)
-        gathered_values = torch.gather(value, dim=-2, index=indices.unsqueeze(-1).expand(-1, -1, self.head_dim))
-        attn_output = gathered_values.mean(dim=1) 
-        
-        return attn_output, distances
+def faiss_based_attention(self, query, value):
+    print("attention entered")
+    query_np = query.detach().cpu().numpy().astype(np.float32)  # Convert query to NumPy
+    num_queries = query_np.shape[0]  # Number of query vectors
+    print("Query shape:", query_np.shape)
+
+    all_distances = []
+    all_indices = []
+
+    for i in range(num_queries):
+        distances, indices = self.index.search(query_np[i:i+1], self.k_neighbors)  # Search one row
+        all_distances.append(distances)
+        all_indices.append(indices)
+
+    print("Search done")
+
+    distances = torch.tensor(np.vstack(all_distances), device=value.device)
+    indices = torch.tensor(np.vstack(all_indices), device=value.device)
+
+    gathered_values = torch.gather(value, dim=-2, index=indices.unsqueeze(-1).expand(-1, -1, self.head_dim))
+    attn_output = gathered_values.mean(dim=1)
+
+    return attn_output, distances
 
     def forward(
         self,
@@ -68,6 +80,8 @@ class FAISSAttention(GPT2Attention):
         print("Added the keys to Faiss")
         print(self.index.ntotal)
 
+        start_time = time.time()
+
         # FAISS-based similarity search for queries
         attn_output, attn_weights = self.faiss_based_attention(query, value)
 
@@ -78,7 +92,8 @@ class FAISSAttention(GPT2Attention):
         attn_output = self.c_proj(attn_output)
         attn_output = self.resid_dropout(attn_output)
 
-        print("Waffle")
+        custom_model_time = (time.time() - start_time)
+        print(custom_model_time)
 
         outputs = (attn_output, None)
         if output_attentions:
